@@ -69,8 +69,8 @@ class BaseStore<TRecord> {
     return this.dbClient.deleteOne({ storeName: this.storeName, query, index });
   }
 
-  async create(data: TRecord): Promise<TRecord> {
-    return this.dbClient.create({ storeName: this.storeName, record: data }) as TRecord;
+  async create(data: TRecord | TRecord[]): Promise<TRecord | TRecord[]> {
+    return this.dbClient.create({ storeName: this.storeName, records: data }) as TRecord;
   }
 }
 

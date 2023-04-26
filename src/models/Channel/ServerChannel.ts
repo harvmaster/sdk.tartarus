@@ -1,9 +1,9 @@
-import Message, { MessageInterface } from '../Message/Message'
+import Message, { MessageInterface } from '../Message'
 import Channel, { ChannelInterface } from './Channel'
 
 export interface ServerChannelInterface extends ChannelInterface { 
   serverId: string,
-  type: ChannelType,
+  type: keyof typeof ChannelType,
   permittedRoles: string[],
 }
 
@@ -14,7 +14,7 @@ export enum ChannelType {
 
 export class ServerChannel extends Channel {
   serverId: string
-  type: ChannelType
+  type: keyof typeof ChannelType
   permittedRoles: string[]
 
   constructor (data: ServerChannelInterface) {
@@ -38,7 +38,7 @@ export class ServerChannel extends Channel {
     // }
 
     // Validate `type` property (required)
-    if (!Object.values(ChannelType).includes(channel.type)) {
+    if (!Object.keys(ChannelType).includes(channel.type)) {
       errors.push("`type` must be one of the following values: " + Object.values(ChannelType).join(", "));
     }
 

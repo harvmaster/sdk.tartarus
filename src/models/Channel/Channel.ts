@@ -1,4 +1,5 @@
-import Message, { MessageInterface } from '../Message/Message'
+import Message, { MessageInterface } from '../Message'
+import MessageManager from '../MessageManager.ts'
 
 export interface ChannelInterface {
   id: string,
@@ -18,7 +19,7 @@ export class Channel {
   shortId: string
   name: string
 
-  messages: Message[]
+  messages: MessageManager
   created: Date
 
   constructor (data: ChannelInterface) {
@@ -28,8 +29,9 @@ export class Channel {
     this.name = data.name;
     this.shortId = data.shortId;
 
-    this.messages = []
-    if (data.messages != undefined) data.messages.forEach(message => this.importMessage(message))
+    this.messages = new MessageManager()
+    if (data.messages != undefined && data.messages instanceof Array) data.messages.forEach(message => this.messages.addMessage(message))
+    // if (data.messages != undefined) data.messages.forEach(message => this.importMessage(message))
 
     this.created = new Date(data.created);
   }

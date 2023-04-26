@@ -52,7 +52,7 @@ let version = 1
 async function openMyDatabase(v?: number, onUpgrade?: (db: IDBDatabase) => void) : Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (v === undefined) v = version
-    const openRequest = indexedDB.open('myDatabase', v);
+    const openRequest = indexedDB.open('Tartarus', v);
 
     openRequest.onsuccess = () => {
       version = openRequest.result.version
@@ -291,18 +291,31 @@ async function handleMessage(event: any) {
       }
 
       case 'create': {
-        const { storeName, record } = payload;
+        let { storeName, records } = payload;
         const tx = db.transaction(storeName,'readwrite');
         const store = tx.objectStore(storeName);
-        const addRequest = store.add(record);
 
-        addRequest.onsuccess = (event: any) => {
+        if (!(records instanceof Array)) {
+          records = [records];
+        }
+
+        let created: any = []
+        const addRequests = records.map((record: any) => store.add(record));
+        addRequests.forEach((request: any) => {
+          request.onsuccess = (event: any) => {
+            const key = (event.target as IDBRequest<any>).result;
+            created.push(key)
+          }
+        })
+
+        tx.oncomplete = (event: any) => {
           const key = (event.target as IDBRequest<any>).result;
-          sendMessage({ requestId, result: key });
+          sendMessage({ requestId, result: created });
         };
   
-        addRequest.onerror = (event: any) => {
-          sendMessage({ requestId, error: addRequest.error });
+        tx.onerror = (event: any) => {
+          console.log(`You have an error dipshit`)
+          sendMessage({ requestId, requestType: 'error', result: tx.error });
         };
         break;
       }
@@ -321,6 +334,6 @@ async function handleMessage(event: any) {
     db.close();
   } catch (error: any) {
     console.log(error)
-    sendMessage({ requestId, error: error.message });
+    sendMessage({ requestId, requestType: 'error', result: error.message });
   }
 };

@@ -22,7 +22,7 @@ describe('ServerStore', () => {
     };
 
     const createdId = await serverStore.create(server);
-    expect(createdId).toBe("1");
+    expect(createdId).toEqual(["1"]);
   }, 3000);
 
   test('can find a server by id', async () => {

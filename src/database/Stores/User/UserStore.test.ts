@@ -23,7 +23,7 @@ describe('UserStore', () => {
     };
 
     const createdId = await userStore.create(user);
-    expect(createdId).toBe("1");
+    expect(createdId).toEqual(["1"]);
   }, 3000);
 
   test('can find a user by id', async () => {

@@ -85,7 +85,12 @@ class DbClient {
     payload: FindPayload | FindOnePayload | FindAndUpdatePayload | DeletePayload | DeleteOnePayload | CreatePayload | CreateObjectStoresPayload
   ): Promise<T> {
     return new Promise((resolve, reject) => {
-      const requestId = `${requestType}-${Math.floor(Math.random()*100000)}`;
+      const generateRequestId = () => `${requestType}-${Math.floor(Math.random()*10000000)}`;
+      let requestId = generateRequestId();
+      while (this.pendingRequests.get('res-'+requestId)) {
+        console.log('Collision')
+        requestId = generateRequestId()
+      }
       this.pendingRequests.set(`res-${requestId}`, resolve);
       // console.log('Sending request', requestId, requestType, payload);
       this.sharedWorker.port.postMessage({ requestId, requestType, payload });
@@ -133,8 +138,8 @@ class DbClient {
     return success;
   }
 
-  async create(record: any): Promise<number> {
-    const data = await this._sendRequest<any>('create', { ...record });
+  async create(records: any): Promise<number> {
+    const data = await this._sendRequest<any>('create', { ...records });
     return data
     // return createdId;
   }

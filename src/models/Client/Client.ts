@@ -9,9 +9,9 @@ export class Client {
     this.keyManager = new KeyManager();
   }
 
-  get authenticated() {
+  // get authenticated() {
 
-  }
+  // }
 
 
 }

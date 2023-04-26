@@ -20,3 +20,5 @@ export class SharedWorkerWrapper {
     return SharedWorkerWrapper.instance;
   }
 }
+
+export default SharedWorkerWrapper

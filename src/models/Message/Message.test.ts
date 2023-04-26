@@ -1,4 +1,4 @@
-import Message, { MessageInterface } from './Message'
+import Message, { MessageInterface } from '.'
 
 describe('Message', () => {
   let messageData: MessageInterface
@@ -6,6 +6,7 @@ describe('Message', () => {
   beforeEach(() => {
     messageData = {
       id: '123',
+      shortId: '123',
       channelId: 'testChannel',
       author: 'testAuthor',
       content: new TextEncoder().encode('test').buffer,
@@ -21,6 +22,7 @@ describe('Message', () => {
     const message = new Message(messageData)
     expect(message).toBeInstanceOf(Message)
     expect(message.id).toBe(messageData.id)
+    expect(message.shortId).toBe(messageData.shortId)
     expect(message.channelId).toBe(messageData.channelId)
     expect(message.author).toBe(messageData.author)
     expect(message.content).toBe(messageData.content)

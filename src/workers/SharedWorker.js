@@ -64,7 +64,7 @@ function openMyDatabase(v, onUpgrade) {
             return [2 /*return*/, new Promise(function (resolve, reject) {
                     if (v === undefined)
                         v = version;
-                    var openRequest = indexedDB.open('myDatabase', v);
+                    var openRequest = indexedDB.open('Tartarus', v);
                     openRequest.onsuccess = function () {
                         version = openRequest.result.version;
                         resolve(openRequest.result);
@@ -116,7 +116,7 @@ function updateObjectStores(schemas) {
 }
 function handleMessage(event) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, requestId, requestType, payload, db, _b, storeName, query_1, indexName, tx, store, source, records_1, cursorRequest, storeName, query_2, indexName, tx, store, source, cursorRequest, storeName, id, tx, store, storeName, query_3, update_1, indexName, tx, store, source, updatedRecords_1, cursorRequest, storeName, query_4, update_2, indexName, tx, store, source, updatedRecord_1, cursorRequest, storeName, query_5, indexName, tx, store, source, cursorRequest, deleted_1, storeName, query_6, indexName, tx, store, source, cursorRequest, storeName, record, tx, store, addRequest_1, error_1;
+        var _a, requestId, requestType, payload, db, _b, storeName, query_1, indexName, tx, store, source, records_1, cursorRequest, storeName, query_2, indexName, tx, store, source, cursorRequest, storeName, id, tx, store, storeName, query_3, update_1, indexName, tx, store, source, updatedRecords_1, cursorRequest, storeName, query_4, update_2, indexName, tx, store, source, updatedRecord_1, cursorRequest, storeName, query_5, indexName, tx, store, source, cursorRequest, deleted_1, storeName, query_6, indexName, tx, store, source, cursorRequest, storeName, records, tx_1, store_1, created_1, addRequests, error_1;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
@@ -328,16 +328,27 @@ function handleMessage(event) {
                     _c.label = 10;
                 case 10:
                     {
-                        storeName = payload.storeName, record = payload.record;
-                        tx = db.transaction(storeName, 'readwrite');
-                        store = tx.objectStore(storeName);
-                        addRequest_1 = store.add(record);
-                        addRequest_1.onsuccess = function (event) {
+                        storeName = payload.storeName, records = payload.records;
+                        tx_1 = db.transaction(storeName, 'readwrite');
+                        store_1 = tx_1.objectStore(storeName);
+                        if (!(records instanceof Array)) {
+                            records = [records];
+                        }
+                        created_1 = [];
+                        addRequests = records.map(function (record) { return store_1.add(record); });
+                        addRequests.forEach(function (request) {
+                            request.onsuccess = function (event) {
+                                var key = event.target.result;
+                                created_1.push(key);
+                            };
+                        });
+                        tx_1.oncomplete = function (event) {
                             var key = event.target.result;
-                            sendMessage({ requestId: requestId, result: key });
+                            sendMessage({ requestId: requestId, result: created_1 });
                         };
-                        addRequest_1.onerror = function (event) {
-                            sendMessage({ requestId: requestId, error: addRequest_1.error });
+                        tx_1.onerror = function (event) {
+                            console.log("You have an error dipshit");
+                            sendMessage({ requestId: requestId, requestType: 'error', result: tx_1.error });
                         };
                         return [3 /*break*/, 13];
                     }
@@ -358,7 +369,7 @@ function handleMessage(event) {
                 case 14:
                     error_1 = _c.sent();
                     console.log(error_1);
-                    sendMessage({ requestId: requestId, error: error_1.message });
+                    sendMessage({ requestId: requestId, requestType: 'error', result: error_1.message });
                     return [3 /*break*/, 15];
                 case 15: return [2 /*return*/];
             }

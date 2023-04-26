@@ -1,5 +1,6 @@
 export interface MessageInterface {
   id: string,
+  shortId: string,
   channelId: string,
   author: string,
   content: ArrayBuffer,
@@ -11,9 +12,10 @@ export interface MessageInterface {
 
 export class Message {
   id!: string;
+  shortId!: string;
   channelId!: string;
   author!: string;
-  content!: ArrayBuffer;
+  content!: string;
   keyUsed!: string;
   mentions!: string[];
   revision!: string;
